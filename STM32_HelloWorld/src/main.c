@@ -44,6 +44,9 @@ int main(void)
 #ifdef USE_SEMIHOSTING
 	initialise_monitor_handles();
 #endif
+
+	DWT->CTRL |= (1 << 0); // Enable CYCCNT in DWT_CTRL
+
 	// 1. Reset the RCC clock configuration to the default reset state.
 	// HSI ON, PLL OFF, HSE OFF, system clock = 16MHz, cpu_clock = 16MHz
 	RCC_DeInit();
@@ -52,6 +55,10 @@ int main(void)
 	SystemCoreClockUpdate();
 
 	prvSetupHardware();
+
+	// Start recording
+	SEGGER_SYSVIEW_Conf();
+	SEGGER_SYSVIEW_Start();
 
 	// 3. Create two tasks, task-1 and task-2
 	xTaskCreate(vTask1_handler, "Task-1", configMINIMAL_STACK_SIZE, NULL, 2, &xTaskHandle1);
@@ -67,17 +74,17 @@ void vTask1_handler(void *params)
 {
 	while(1)
 	{
-#ifdef USE_SEMIHOSTING
-		printf("Hello-world: From Task-1\n");
-#else
 		if(UART_ACCESS_KEY == AVAILABLE)
 		{
 			UART_ACCESS_KEY = NOT_AVAILABLE;
+#ifdef USE_SEMIHOSTING
+			printf("Hello-world: From Task-1\n");
+#else
 			printmsg("Hello-world: From Task-1\r\n");
+#endif
 			UART_ACCESS_KEY = AVAILABLE;
 			taskYIELD();
 		}
-#endif
 	}
 }
 
@@ -85,17 +92,17 @@ void vTask2_handler(void *params)
 {
 	while (1)
 	{
-#ifdef USE_SEMIHOSTING
-		printf("Hello-world: From Task-2\n");
-#else
 		if(UART_ACCESS_KEY == AVAILABLE)
 		{
 			UART_ACCESS_KEY = NOT_AVAILABLE;
+#ifdef USE_SEMIHOSTING
+			printf("Hello-world: From Task-2\n");
+#else
 			printmsg("Hello-world: From Task-2\r\n");
+#endif
 			UART_ACCESS_KEY = AVAILABLE;
 			taskYIELD();
 		}
-#endif
 	}
 }
 
