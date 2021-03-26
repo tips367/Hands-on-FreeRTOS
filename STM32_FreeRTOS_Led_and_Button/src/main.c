@@ -14,6 +14,10 @@
 #include "FreeRTOS.h"
 #include "task.h"
 
+#define NOT_PRESSED 0
+#define PRESSED		1
+
+
 // function prototypes
 static void prvSetupHardware(void);
 static void prvSetupUART(void);
@@ -23,6 +27,9 @@ void printmsg(char *msg);
 // task prototypes
 void ledTaskHandler(void *params);
 void buttonTaskHandler(void *params);
+
+// global space for some variable
+uint8_t buttonStatusFlag = NOT_PRESSED;
 
 int main(void)
 {
@@ -51,7 +58,16 @@ void ledTaskHandler(void *params)
 {
 	while(1)
 	{
-
+		if(buttonStatusFlag == PRESSED)
+		{
+			// Turn on the LED
+			GPIO_WriteBit(GPIOD, GPIO_Pin_12, Bit_SET);
+		}
+		else
+		{
+			// Turn off the LED
+			GPIO_WriteBit(GPIOD, GPIO_Pin_12, Bit_RESET);
+		}
 	}
 }
 
@@ -59,7 +75,16 @@ void buttonTaskHandler(void *params)
 {
 	while(1)
 	{
-
+		if(GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_0))
+		{
+			// User button is pressed on Discovery board
+			buttonStatusFlag = PRESSED;
+		}
+		else
+		{
+			// User button is not pressed on Discovery board
+			buttonStatusFlag = NOT_PRESSED;
+		}
 	}
 }
 
