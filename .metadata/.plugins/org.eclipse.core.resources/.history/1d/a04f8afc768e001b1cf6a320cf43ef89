@@ -1,0 +1,42 @@
+/**
+  ******************************************************************************
+  * @file    main.c
+  * @author  Tipu khan
+  * @version V1.0
+  * @date    27-March-2021
+  * @brief   Default main function.
+  ******************************************************************************
+*/
+
+
+#include "stm32f4xx.h"
+			
+
+int main(void)
+{
+	// 1. Reset the RCC clock configuration to the default reset state.
+	// HSI ON, PLL OFF, HSE OFF, system clock = 16MHz, cpu_clock = 16MHz
+	RCC_DeInit();
+
+	// 2. Update the SystemCoreClock variable
+	SystemCoreClockUpdate();
+
+	prvSetupHardware();
+
+	for(;;);
+}
+
+static void prvSetupHardware(void)
+{
+	//setup UART2
+	prvSetupUart();
+}
+
+void printmsg(char *msg)
+{
+	for(uint32_t i=0; i < strlen(msg); i++)
+	{
+		while(USART_GetFlagStatus(USART2, USART_FLAG_TXE) != SET);
+		USART_SendData(USART2, msg[i]);
+	}
+}

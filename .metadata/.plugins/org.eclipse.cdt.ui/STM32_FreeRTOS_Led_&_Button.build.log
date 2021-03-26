@@ -1,0 +1,29 @@
+02:00:38 **** Incremental Build of configuration Debug for project STM32_FreeRTOS_Led_&_Button ****
+make -j4 all 
+Building file: ../startup/startup_stm32.s
+Building file: ../src/main.c
+Building file: ../src/system_stm32f4xx.c
+Building file: ../Third-Party/FreeRTOS/org/Source/portable/MemMang/heap_4.c
+Invoking: MCU GCC Assembler
+Invoking: MCU GCC Compiler
+Invoking: MCU GCC Compiler
+Invoking: MCU GCC Compiler
+c:/ac6/systemworkbench/plugins/fr.ac6.mcu.externaltools.arm-none.win32_1.17.0.201812190825/tools/make/sh: _ButtonDebug: not found
+E:StudyProjectsEmbeddedRTOS_ProjectsSTM32_FreeRTOS_Led_
+make: *** [startup/startup_stm32.o] Error 127
+startup/subdir.mk:15: recipe for target 'startup/startup_stm32.o' failed
+make: *** Waiting for unfinished jobs....
+c:/ac6/systemworkbench/plugins/fr.ac6.mcu.externaltools.arm-none.win32_1.17.0.201812190825/tools/make/sh: _ButtonDebug: not found
+c:/ac6/systemworkbench/plugins/fr.ac6.mcu.externaltools.arm-none.win32_1.17.0.201812190825/tools/make/sh: _ButtonDebug: not found
+src/subdir.mk:21: recipe for target 'src/system_stm32f4xx.o' failed
+make: *** [src/system_stm32f4xx.o] Error 127
+src/subdir.mk:21: recipe for target 'src/main.o' failed
+make: *** [src/main.o] Error 127
+E:StudyProjectsEmbeddedRTOS_ProjectsSTM32_FreeRTOS_Led_
+E:StudyProjectsEmbeddedRTOS_ProjectsSTM32_FreeRTOS_Led_
+c:/ac6/systemworkbench/plugins/fr.ac6.mcu.externaltools.arm-none.win32_1.17.0.201812190825/tools/make/sh: _ButtonDebug: not found
+Third-Party/FreeRTOS/org/Source/portable/MemMang/subdir.mk:18: recipe for target 'Third-Party/FreeRTOS/org/Source/portable/MemMang/heap_4.o' failed
+make: *** [Third-Party/FreeRTOS/org/Source/portable/MemMang/heap_4.o] Error 127
+
+02:00:39 Build Finished (took 746ms)
+
