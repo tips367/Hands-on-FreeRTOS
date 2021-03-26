@@ -60,13 +60,13 @@ void ledTaskHandler(void *params)
 	{
 		if(buttonStatusFlag == PRESSED)
 		{
-			// Turn on the LED
-			GPIO_WriteBit(GPIOD, GPIO_Pin_12, Bit_SET);
+			// Turn on the LEDs
+			GPIO_WriteBit(GPIOD, GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15 , Bit_SET);
 		}
 		else
 		{
-			// Turn off the LED
-			GPIO_WriteBit(GPIOD, GPIO_Pin_12, Bit_RESET);
+			// Turn off the LEDs
+			GPIO_WriteBit(GPIOD, GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15, Bit_RESET);
 		}
 	}
 }
@@ -151,7 +151,7 @@ static void prvSetupGPIO(void)
 	GPIO_InitTypeDef ledInit, buttonInit;
 	ledInit.GPIO_Mode = GPIO_Mode_OUT;
 	ledInit.GPIO_OType = GPIO_OType_PP;
-	ledInit.GPIO_Pin = GPIO_Pin_12;
+	ledInit.GPIO_Pin = GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15;
 	ledInit.GPIO_Speed = GPIO_Low_Speed;
 	ledInit.GPIO_PuPd = GPIO_PuPd_NOPULL;
 	GPIO_Init(GPIOD, &ledInit);
