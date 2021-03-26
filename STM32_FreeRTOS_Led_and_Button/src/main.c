@@ -16,7 +16,8 @@
 
 // function prototypes
 static void prvSetupHardware(void);
-static void prvSetupUart(void);
+static void prvSetupUART(void);
+static void prvSetupGPIO(void);
 void printmsg(char *msg);
 
 // task prototypes
@@ -65,9 +66,9 @@ void buttonTaskHandler(void *params)
 static void prvSetupHardware(void)
 {
 	// setup button and LED
-	prvSetupGpio();
+	prvSetupGPIO();
 	//setup UART2
-	prvSetupUart();
+	prvSetupUART();
 }
 
 void printmsg(char *msg)
@@ -79,7 +80,7 @@ void printmsg(char *msg)
 	}
 }
 
-static void prvSetupUart(void)
+static void prvSetupUART(void)
 {
 	GPIO_InitTypeDef gpio_uart_pins;
 	USART_InitTypeDef uart2_init;
@@ -115,7 +116,26 @@ static void prvSetupUart(void)
 	USART_Cmd(USART2, ENABLE);
 }
 
-void prvSetupGpio(void)
+static void prvSetupGPIO(void)
 {
 	// This function is board specific
+
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
+
+	GPIO_InitTypeDef ledInit, buttonInit;
+	ledInit.GPIO_Mode = GPIO_Mode_OUT;
+	ledInit.GPIO_OType = GPIO_OType_PP;
+	ledInit.GPIO_Pin = GPIO_Pin_12;
+	ledInit.GPIO_Speed = GPIO_Low_Speed;
+	ledInit.GPIO_PuPd = GPIO_PuPd_NOPULL;
+	GPIO_Init(GPIOD, &ledInit);
+
+	buttonInit.GPIO_Mode = GPIO_Mode_IN;
+	buttonInit.GPIO_OType = GPIO_OType_PP;
+	buttonInit.GPIO_Pin = GPIO_Pin_0;
+	buttonInit.GPIO_Speed = GPIO_Low_Speed;
+	buttonInit.GPIO_PuPd = GPIO_PuPd_NOPULL;
+	GPIO_Init(GPIOA, &buttonInit);
+
 }
