@@ -505,6 +505,7 @@ void xPortSysTickHandler( void )
 		else
 		{
 			traceISR_EXIT();
+			vTaskSwitchContext(); // dummy call to help the SEGGER to show task trace
 		}
 	}
 	portENABLE_INTERRUPTS();
