@@ -14,22 +14,20 @@
 #include "FreeRTOS.h"
 #include "task.h"
 
-#define NOT_PRESSED 0
-#define PRESSED		1
-
-
 // function prototypes
 static void prvSetupHardware(void);
 static void prvSetupUART(void);
 static void prvSetupGPIO(void);
 void printmsg(char *msg);
+void rtosDelay(uint32_t delayInMs);
 
 // task prototypes
 void ledTaskHandler(void *params);
 void buttonTaskHandler(void *params);
 
 // global space for some variable
-uint8_t buttonStatusFlag = NOT_PRESSED;
+TaskHandle_t xLedTaskHandle = NULL;
+TaskHandle_t xButtonTaskHandle = NULL;
 
 int main(void)
 {
@@ -49,10 +47,10 @@ int main(void)
 	SEGGER_SYSVIEW_Start();
 
 	// 3. Create Led task
-	xTaskCreate(ledTaskHandler, "LED-TASK", configMINIMAL_STACK_SIZE, NULL, 1, NULL);
+	xTaskCreate(ledTaskHandler, "LED-TASK", 500, NULL, 2, &xLedTaskHandle);
 
 	// 4. Create Button task
-	xTaskCreate(buttonTaskHandler, "BUTTON-TASK", configMINIMAL_STACK_SIZE, NULL, 1, NULL);
+	xTaskCreate(buttonTaskHandler, "BUTTON-TASK", 500, NULL, 2, &xButtonTaskHandle);
 
 	// 5. Start the scheduler
 	vTaskStartScheduler();
@@ -64,15 +62,11 @@ void ledTaskHandler(void *params)
 {
 	while(1)
 	{
-		if(buttonStatusFlag == PRESSED)
+		// Wait until we receive any notification event from button task
+		if(xTaskNotifyWait(0,0,NULL,portMAX_DELAY) == pdTRUE)
 		{
-			// Turn on the LEDs
-			GPIO_WriteBit(GPIOD, GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15 , Bit_SET);
-		}
-		else
-		{
-			// Turn off the LEDs
-			GPIO_WriteBit(GPIOD, GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15, Bit_RESET);
+			// Received the notification so toggle the LED
+			GPIO_ToggleBits(GPIOD, GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15);
 		}
 	}
 }
@@ -84,12 +78,12 @@ void buttonTaskHandler(void *params)
 		if(GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_0))
 		{
 			// User button is pressed on Discovery board
-			buttonStatusFlag = PRESSED;
-		}
-		else
-		{
-			// User button is not pressed on Discovery board
-			buttonStatusFlag = NOT_PRESSED;
+
+			// wait here for 200 ms to compensate for button debouncing
+			rtosDelay(200);
+
+			// Send the notification to LED task
+			xTaskNotify(xLedTaskHandle, 0x0, eNoAction);
 		}
 	}
 }
@@ -169,4 +163,11 @@ static void prvSetupGPIO(void)
 	buttonInit.GPIO_PuPd = GPIO_PuPd_NOPULL;
 	GPIO_Init(GPIOA, &buttonInit);
 
+}
+
+void rtosDelay(uint32_t delayInMs)
+{
+	uint32_t currentTickCount = xTaskGetTickCount();
+	uint32_t delayInTicks = (delayInMs * configTICK_RATE_HZ) / 1000;
+	while(xTaskGetTickCount() < (currentTickCount + delayInTicks));
 }
