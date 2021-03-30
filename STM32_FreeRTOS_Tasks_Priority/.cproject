@@ -74,8 +74,24 @@
 							</tool>
 						</toolChain>
 					</folderInfo>
+					<folderInfo id="fr.ac6.managedbuild.config.gnu.cross.exe.debug.111961205.1467727020" name="/" resourcePath="Config">
+						<toolChain id="fr.ac6.managedbuild.toolchain.gnu.cross.exe.debug.588578497" name="Ac6 STM32 MCU GCC" superClass="fr.ac6.managedbuild.toolchain.gnu.cross.exe.debug" unusedChildren="">
+							<option id="fr.ac6.managedbuild.option.gnu.cross.mcu.476534340.1629274642" name="Mcu" superClass="fr.ac6.managedbuild.option.gnu.cross.mcu.476534340"/>
+							<option id="fr.ac6.managedbuild.option.gnu.cross.fpu.568957353.705870380" name="Floating point hardware" superClass="fr.ac6.managedbuild.option.gnu.cross.fpu.568957353"/>
+							<option id="fr.ac6.managedbuild.option.gnu.cross.floatabi.755005982.1878623776" name="Floating-point ABI" superClass="fr.ac6.managedbuild.option.gnu.cross.floatabi.755005982"/>
+							<option id="fr.ac6.managedbuild.option.gnu.cross.board.955343544.570093373" name="Board" superClass="fr.ac6.managedbuild.option.gnu.cross.board.955343544"/>
+							<tool id="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.1693633499" name="MCU GCC Compiler" superClass="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.536273798"/>
+							<tool id="fr.ac6.managedbuild.tool.gnu.cross.cpp.compiler.974624638" name="MCU G++ Compiler" superClass="fr.ac6.managedbuild.tool.gnu.cross.cpp.compiler.1331308295"/>
+							<tool id="fr.ac6.managedbuild.tool.gnu.cross.c.linker.919075382" name="MCU GCC Linker" superClass="fr.ac6.managedbuild.tool.gnu.cross.c.linker.163073177"/>
+							<tool id="fr.ac6.managedbuild.tool.gnu.cross.cpp.linker.1051650315" name="MCU G++ Linker" superClass="fr.ac6.managedbuild.tool.gnu.cross.cpp.linker.558825449"/>
+							<tool id="fr.ac6.managedbuild.tool.gnu.archiver.290597301" name="MCU GCC Archiver" superClass="fr.ac6.managedbuild.tool.gnu.archiver.799264441"/>
+							<tool id="fr.ac6.managedbuild.tool.gnu.cross.assembler.1128143785" name="MCU GCC Assembler" superClass="fr.ac6.managedbuild.tool.gnu.cross.assembler.274883976"/>
+						</toolChain>
+					</folderInfo>
 					<sourceEntries>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Config"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="StdPeriph_Driver"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Third-Party"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="startup"/>
 					</sourceEntries>
