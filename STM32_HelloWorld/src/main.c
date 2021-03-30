@@ -126,7 +126,7 @@ static void prvSetupUart(void)
 
 	// 3. AF mode settings for the pins
 	GPIO_PinAFConfig(GPIOA, GPIO_PinSource2, GPIO_AF_USART2); // PA2
-	GPIO_PinAFConfig(GPIOA, GPIO_PinSource2, GPIO_AF_USART2); // PA3
+	GPIO_PinAFConfig(GPIOA, GPIO_PinSource3, GPIO_AF_USART2); // PA3
 
 	// 4. UART parameter initializations
 	memset(&uart2_init, 0, sizeof(uart2_init));
