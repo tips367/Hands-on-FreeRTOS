@@ -13,42 +13,9 @@
 #include <stdio.h>
 #include "stm32f4xx.h"
 
-#include "FreeRTOS.h"
+#include "main.h"
 #include "task.h"
 #include "queue.h"
-#include "timers.h"
-
-#define LED_GREEN_PIN	GPIO_Pin_12
-#define LED_ORANGE_PIN	GPIO_Pin_13
-#define LED_RED_PIN		GPIO_Pin_14
-#define LED_BLUE_PIN	GPIO_Pin_15
-#define LED_ALL_PIN		LED_GREEN_PIN | LED_ORANGE_PIN | LED_RED_PIN | LED_BLUE_PIN
-
-// function prototypes
-static void prvSetupHardware(void);
-static void prvSetupUART(void);
-static void prvSetupGPIO(void);
-void printmsg(char *msg);
-void getArguments(uint8_t *buffer);
-uint8_t getCommandCode(uint8_t *buffer);
-
-// prototypes command helper functions
-void turnOnLed(void);
-void turnOffLed(void);
-void startLedToggle(uint32_t duration);
-void stopLedToggle(void);
-void readLedStatus(char *taskMsg);
-void readRtcInfo(char *taskMsg);
-void printErrorMessage(char *taskMsg);
-
-// Software timer callback function prototype
-void ledToggle(TimerHandle_t xTimer);
-
-// task prototypes
-static void vTask1_menu_display(void *params);
-static void vTask2_cmd_handling(void *params);
-static void vTask3_cmd_processing(void *params);
-static void vTask4_uart_write(void *params);
 
 // task handles
 TaskHandle_t xTask1_handle = NULL;
@@ -63,13 +30,6 @@ QueueHandle_t uartWriteQueue = NULL;
 // software timer handler
 TimerHandle_t ledTimerHandle = NULL;
 
-// command structure
-typedef struct APP_CMD
-{
-	uint8_t CMD_NUM;
-	uint8_t CMD_ARGS[10];
-}APP_CMD_t;
-
 uint8_t cmdBuffer[20];
 uint8_t cmdLen = 0;
 
@@ -83,14 +43,6 @@ char menu[]={"\
 \r\nRTC_PRINT_DATETIME ----> 6 \
 \r\nEXIT_APP           ----> 0 \
 \r\nType your option here : "};
-
-#define LED_ON_COMMAND 					1
-#define LED_OFF_COMMAND 				2
-#define LED_TOGGLE_COMMAND 				3
-#define LED_TOGGLE_STOP_COMMAND 		4
-#define LED_READ_STATUS_COMMAND 		5
-#define RTC_READ_DATE_TIME_COMMAND		6
-
 
 int main(void)
 {
