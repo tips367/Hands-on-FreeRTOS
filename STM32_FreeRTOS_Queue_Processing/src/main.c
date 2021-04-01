@@ -41,6 +41,9 @@ void readLedStatus(char *taskMsg);
 void readRtcInfo(char *taskMsg);
 void printErrorMessage(char *taskMsg);
 
+// Software timer callback function prototype
+void ledToggle(TimerHandle_t xTimer);
+
 // task prototypes
 static void vTask1_menu_display(void *params);
 static void vTask2_cmd_handling(void *params);
@@ -56,6 +59,9 @@ TaskHandle_t xTask4_handle = NULL;
 // Queue handles
 QueueHandle_t commandQueue = NULL;
 QueueHandle_t uartWriteQueue = NULL;
+
+// software timer handler
+TimerHandle_t ledTimerHandle = NULL;
 
 // command structure
 typedef struct APP_CMD
@@ -210,7 +216,7 @@ static void vTask3_cmd_processing(void *params)
 			printErrorMessage(taskMsg);
 		}
 
-		//lets free the allocated memory for the new command
+		// free the allocated memory for the new command
 		vPortFree(pNewCmd);
 	}
 }
@@ -387,25 +393,20 @@ void ledToggle(TimerHandle_t xTimer)
 }
 
 void startLedToggle(uint32_t duration)
-{/*
-	if(led_timer_handle == NULL)
+{
+	if(ledTimerHandle == NULL)
 	{
-		//1. lets create the software timer
-		led_timer_handle = xTimerCreate("LED-TIMER",duration,pdTRUE,NULL,ledToggle);
-
-		//2. start the software timer
-		xTimerStart(led_timer_handle,portMAX_DELAY);
+		//1.Create the software timer
+		ledTimerHandle = xTimerCreate("LED-TIMER",duration,pdTRUE,NULL,ledToggle);
 	}
-	else
-	{
-		//start the software timer
-		xTimerStart(led_timer_handle,portMAX_DELAY);
-	}*/
+
+	//2. Start the software timer
+	xTimerStart(ledTimerHandle,portMAX_DELAY);
 }
 
 void stopLedToggle(void)
 {
-	// xTimerStop(led_timer_handle,portMAX_DELAY);
+	xTimerStop(ledTimerHandle,portMAX_DELAY);
 }
 
 void readLedStatus(char *taskMsg)
@@ -422,7 +423,7 @@ void readRtcInfo(char *taskMsg)
 	RTC_GetTime(RTC_Format_BIN, &RTC_time);
 	RTC_GetDate(RTC_Format_BIN, &RTC_date);
 
-	sprintf(taskMsg,"\r\nTime: %02d:%02d:%02d \r\n Date : %02d-%2d-%2d \r\n",RTC_time.RTC_Hours,RTC_time.RTC_Minutes,RTC_time.RTC_Seconds, \
+	sprintf(taskMsg,"\r\nTime: %02d:%02d:%02d \r\nDate: %02d-%2d-%2d \r\n",RTC_time.RTC_Hours,RTC_time.RTC_Minutes,RTC_time.RTC_Seconds, \
 									RTC_date.RTC_Date,RTC_date.RTC_Month,RTC_date.RTC_Year );
 	xQueueSend(uartWriteQueue,&taskMsg,portMAX_DELAY);
 }
