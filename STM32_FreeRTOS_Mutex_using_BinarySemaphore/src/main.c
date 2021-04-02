@@ -15,7 +15,6 @@
 #include "stm32f4xx.h"
 #include "FreeRTOS.h"
 #include "task.h"
-#include "queue.h"
 #include "semphr.h"
 
 // function prototypes
@@ -25,15 +24,11 @@ static void prvSetupGPIO(void);
 void printMsg(char *msg);
 
 // task prototypes
-void vManagerTask(void *params);
-void vEmployeeTask(void *params);
+void vTask1(void *params);
+void vTask2(void *params);
 
-/* Variable of type xSemaphoreHandle.  This is used to reference the
-semaphore that is used to synchronize both manager and employee task */
-xSemaphoreHandle xWorkSemaphore;
-
-// Queue which manager uses to put the work ticket id
-xQueueHandle xWorkQueue;
+// binary semaphore handle
+xSemaphoreHandle xBinarySemaphore;
 
 int main(void)
 {
@@ -46,89 +41,58 @@ int main(void)
 
 	prvSetupHardware();
 
-	vSemaphoreCreateBinary(xWorkSemaphore);
+	vSemaphoreCreateBinary(xBinarySemaphore);
 
-	xWorkQueue = xQueueCreate(1, sizeof(unsigned int));
-
-	if( (xWorkSemaphore != NULL) && (xWorkQueue != NULL) )
+	if(xBinarySemaphore != NULL)
 	{
-		// 'Manager' task. This is the task that will be synchronized with the Employee task.
-		xTaskCreate(vManagerTask, "Manager", 500, NULL, 1, NULL);
+		// Create task-1
+		xTaskCreate(vTask1, "Task-1", 500, NULL, 1, NULL);
 
-		// Create employee task
-		xTaskCreate(vEmployeeTask, "Employee", 500, NULL, 1, NULL);
+		// Create task-2
+		xTaskCreate(vTask2, "Task-2", 500, NULL, 1, NULL);
 
-		// 5. Start the scheduler
+		//makes semaphore available for the first time
+		xSemaphoreGive(xBinarySemaphore);
+
+		// Start the scheduler
 		vTaskStartScheduler();
 	}
 
 	for(;;);
 }
 
-void vManagerTask(void *params)
+void vTask1(void *params)
 {
-	unsigned int xWorkTicketId;
-	portBASE_TYPE xStatus;
-
-	/* The semaphore is created in the 'empty' state, meaning the semaphore must first be given
-	 * using the xSemaphoreGive() API function before it can subsequently be taken (obtained) */
-	xSemaphoreGive(xWorkSemaphore);
-
 	while(1)
 	{
-		// get a work ticket id (some random number)
-		xWorkTicketId = ( rand() & 0x1FF );
+		// before printing, lets own the semaphore
+		xSemaphoreTake(xBinarySemaphore, portMAX_DELAY);
 
-		/* Sends work ticket id to the work queue */
-		xStatus = xQueueSend(xWorkQueue, &xWorkTicketId , portMAX_DELAY);
-		if( xStatus != pdPASS )
-		{
-			printMsg("Could not send to the queue.\r\n");
-		}
-		else
-		{
-			/* Manager notifying the employee by giving semaphore */
-			xSemaphoreGive(xWorkSemaphore);
-			taskYIELD();
-		}
+		printMsg("Task 1 is running\r\n");
+
+		// give the semaphore here
+		xSemaphoreGive(xBinarySemaphore);
+
+		// Now this task will be blocked for 500 ms
+		vTaskDelay(pdMS_TO_TICKS(500));
 	}
 }
 
-void employeeDoWork(uint8_t ticket_id)
+void vTask2(void *params)
 {
-	char msg[20];
-	snprintf(msg, sizeof(msg), "Ticket ID: %d\r\n", ticket_id);
-	printMsg(msg);
-	vTaskDelay(ticket_id);
-}
+	while(1)
+	{
+		// before printing, lets own the semaphore
+		xSemaphoreTake(xBinarySemaphore, portMAX_DELAY);
 
-void vEmployeeTask(void *params)
-{
-	char msg[50];
-	unsigned char xWorkTicketId;
-	portBASE_TYPE xStatus;
+		printMsg("Task 2 is running\r\n");
 
-    while(1)
-    {
-		/* First Employee tries to take the semaphore, if it is available that means there
-		 * is a task assigned by manager, otherwise employee task will be blocked */
-		xSemaphoreTake(xWorkSemaphore, 0);
+		// give the semaphore here
+		xSemaphoreGive(xBinarySemaphore);
 
-		// get the ticket id from the work queue
-		xStatus = xQueueReceive(xWorkQueue, &xWorkTicketId, 0);
-
-		if( xStatus == pdPASS )
-		{
-			employeeDoWork(xWorkTicketId);
-		}
-		else
-		{
-			/* We did not receive anything from the queue.  This must be an error
-			 * as this task should only run when the manager assigns at least one work. */
-			sprintf(msg,"Employee task : Queue is empty , nothing to do.\r\n");
-		    printMsg(msg);
-		}
-    }
+		// Now this task will be blocked for 500 ms
+		vTaskDelay(pdMS_TO_TICKS(500));
+	}
 }
 
 static void prvSetupHardware(void)
