@@ -58,7 +58,7 @@ int main(void)
 		// Create employee task
 		xTaskCreate(vEmployeeTask, "Employee", 500, NULL, 1, NULL);
 
-		// 5. Start the scheduler
+		// Start the scheduler
 		vTaskStartScheduler();
 	}
 

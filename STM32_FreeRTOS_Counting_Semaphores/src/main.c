@@ -65,7 +65,7 @@ int main(void)
 		 * time the handler task exit the Blocked state. */
 		xTaskCreate(vPeriodicTask, "Periodic", 500, NULL, 1, NULL);
 
-		// 5. Start the scheduler
+		// Start the scheduler
 		vTaskStartScheduler();
 	}
 
